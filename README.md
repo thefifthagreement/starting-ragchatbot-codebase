@@ -11,7 +11,7 @@ This application is a full-stack web application that enables users to query cou
 
 - Python 3.13 or higher
 - uv (Python package manager)
-- An Anthropic API key (for Claude AI)
+- An Anthropic API key (direct) or OpenRouter API key
 - **For Windows**: Use Git Bash to run the application commands - [Download Git for Windows](https://git-scm.com/downloads/win)
 
 ## Installation
@@ -27,10 +27,21 @@ This application is a full-stack web application that enables users to query cou
    ```
 
 3. **Set up environment variables**
-   
-   Create a `.env` file in the root directory:
+
+   Create a `.env` file at `./api_keys/.env` (relative to the backend directory):
+
+   **For direct Anthropic API:**
    ```bash
-   ANTHROPIC_API_KEY=your_anthropic_api_key_here
+   ANTHROPIC_API_KEY=sk-ant-...
+   ANTHROPIC_MODEL=claude-sonnet-4-20250514
+   # ANTHROPIC_BASE_URL=  # Leave empty or omit for direct API
+   ```
+
+   **For OpenRouter:**
+   ```bash
+   ANTHROPIC_API_KEY=sk-or-v1-...
+   ANTHROPIC_MODEL=anthropic/claude-sonnet-4-20250514
+   ANTHROPIC_BASE_URL=https://openrouter.ai/api/v1
    ```
 
 ## Running the Application
