@@ -256,12 +256,16 @@ class VectorStore:
                 metadata = results['metadatas'][0]
                 lessons_json = metadata.get('lessons_json')
                 if lessons_json:
-                    lessons = json.loads(lessons_json)
-                    # Find the lesson with matching number
-                    for lesson in lessons:
-                        if lesson.get('lesson_number') == lesson_number:
-                            return lesson.get('lesson_link')
+                    try:
+                        lessons = json.loads(lessons_json)
+                        # Find the lesson with matching number
+                        for lesson in lessons:
+                            if lesson.get('lesson_number') == lesson_number:
+                                return lesson.get('lesson_link')
+                    except json.JSONDecodeError as je:
+                        print(f"Error parsing lessons JSON for course '{course_title}': {je}")
+                        return None
             return None
         except Exception as e:
             print(f"Error getting lesson link: {e}")
-    
+            return None

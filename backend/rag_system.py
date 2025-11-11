@@ -1,5 +1,6 @@
 from typing import List, Tuple, Optional, Dict
 import os
+from urllib.parse import urlparse
 from document_processor import DocumentProcessor
 from vector_store import VectorStore
 from ai_generator import AIGenerator
@@ -7,9 +8,26 @@ from session_manager import SessionManager
 from search_tools import ToolManager, CourseSearchTool
 from models import Course, Lesson, CourseChunk
 
+def is_safe_url(url: str) -> bool:
+    """
+    Validate that a URL uses a safe scheme (http or https only).
+    Prevents XSS attacks via javascript: or data: URI injection.
+
+    Args:
+        url: The URL to validate
+
+    Returns:
+        True if the URL uses http or https scheme, False otherwise
+    """
+    try:
+        parsed = urlparse(url)
+        return parsed.scheme in ['http', 'https']
+    except Exception:
+        return False
+
 class RAGSystem:
     """Main orchestrator for the Retrieval-Augmented Generation system"""
-    
+
     def __init__(self, config):
         self.config = config
         
@@ -130,18 +148,43 @@ class RAGSystem:
             tool_manager=self.tool_manager
         )
         
-        # Get sources from the search tool
-        sources = self.tool_manager.get_last_sources()
+        # Get sources from the search tool (structured data)
+        raw_sources = self.tool_manager.get_last_sources()
+
+        # Enhance sources with lesson links
+        enhanced_sources = []
+        for source in raw_sources:
+            # Defensive check: ensure source is a dict with required keys
+            if not isinstance(source, dict) or "text" not in source:
+                continue
+
+            # Source is now a dictionary with 'text', 'course_title', 'lesson_number'
+            source_item = {
+                "text": source["text"],
+                "link": None
+            }
+
+            # Try to get lesson link if lesson number is available
+            if source.get("lesson_number") is not None and source.get("course_title"):
+                lesson_link = self.vector_store.get_lesson_link(
+                    source["course_title"],
+                    source["lesson_number"]
+                )
+                # Validate URL to prevent XSS attacks
+                if lesson_link and is_safe_url(lesson_link):
+                    source_item["link"] = lesson_link
+
+            enhanced_sources.append(source_item)
 
         # Reset sources after retrieving them
         self.tool_manager.reset_sources()
-        
+
         # Update conversation history
         if session_id:
             self.session_manager.add_exchange(session_id, query, response)
-        
-        # Return response with sources from tool searches
-        return response, sources
+
+        # Return response with enhanced sources
+        return response, enhanced_sources
     
     def get_course_analytics(self) -> Dict:
         """Get analytics about the course catalog"""
