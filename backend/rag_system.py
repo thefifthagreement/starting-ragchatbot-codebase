@@ -130,18 +130,38 @@ class RAGSystem:
             tool_manager=self.tool_manager
         )
         
-        # Get sources from the search tool
-        sources = self.tool_manager.get_last_sources()
+        # Get sources from the search tool (structured data)
+        raw_sources = self.tool_manager.get_last_sources()
+
+        # Enhance sources with lesson links
+        enhanced_sources = []
+        for source in raw_sources:
+            # Source is now a dictionary with 'text', 'course_title', 'lesson_number'
+            source_item = {
+                "text": source["text"],
+                "link": None
+            }
+
+            # Try to get lesson link if lesson number is available
+            if source.get("lesson_number") is not None:
+                lesson_link = self.vector_store.get_lesson_link(
+                    source["course_title"],
+                    source["lesson_number"]
+                )
+                if lesson_link:
+                    source_item["link"] = lesson_link
+
+            enhanced_sources.append(source_item)
 
         # Reset sources after retrieving them
         self.tool_manager.reset_sources()
-        
+
         # Update conversation history
         if session_id:
             self.session_manager.add_exchange(session_id, query, response)
-        
-        # Return response with sources from tool searches
-        return response, sources
+
+        # Return response with enhanced sources
+        return response, enhanced_sources
     
     def get_course_analytics(self) -> Dict:
         """Get analytics about the course catalog"""

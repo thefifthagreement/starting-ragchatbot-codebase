@@ -245,6 +245,31 @@ header h1 {
     color: var(--text-secondary);
 }
 
+.source-item {
+    margin: 0.25rem 0;
+    padding: 0.35rem 0.5rem;
+    background: rgba(37, 99, 235, 0.1);
+    border-left: 2px solid var(--primary-color);
+    border-radius: 4px;
+    transition: background 0.2s ease;
+}
+
+.source-item:hover {
+    background: rgba(37, 99, 235, 0.15);
+}
+
+.sources-content a {
+    color: var(--primary-color);
+    text-decoration: none;
+    transition: color 0.2s ease;
+    display: block;
+}
+
+.sources-content a:hover {
+    color: var(--primary-hover);
+    text-decoration: underline;
+}
+
 /* Markdown formatting styles */
 .message-content h1,
 .message-content h2,
