@@ -1,6 +1,13 @@
-from typing import Dict, Any, Optional, Protocol
+from typing import Dict, Any, Optional, Protocol, TypedDict
 from abc import ABC, abstractmethod
 from vector_store import VectorStore, SearchResults
+
+
+class SourceMetadata(TypedDict):
+    """Type definition for source metadata structure"""
+    text: str
+    course_title: str
+    lesson_number: Optional[int]
 
 
 class Tool(ABC):
@@ -19,10 +26,10 @@ class Tool(ABC):
 
 class CourseSearchTool(Tool):
     """Tool for searching course content with semantic course name matching"""
-    
+
     def __init__(self, vector_store: VectorStore):
         self.store = vector_store
-        self.last_sources = []  # Track sources from last search
+        self.last_sources: list[SourceMetadata] = []  # Track sources from last search
     
     def get_tool_definition(self) -> Dict[str, Any]:
         """Return Anthropic tool definition for this tool"""
@@ -88,7 +95,7 @@ class CourseSearchTool(Tool):
     def _format_results(self, results: SearchResults) -> str:
         """Format search results with course and lesson context"""
         formatted = []
-        sources = []  # Track sources for the UI (now structured data)
+        sources: list[SourceMetadata] = []  # Track sources for the UI (now structured data)
 
         for doc, meta in zip(results.documents, results.metadata):
             course_title = meta.get('course_title', 'unknown')
@@ -105,12 +112,13 @@ class CourseSearchTool(Tool):
             if lesson_num is not None:
                 source_text += f" - Lesson {lesson_num}"
 
-            # Store as dictionary with course and lesson info for link lookup
-            sources.append({
+            # Store as TypedDict with course and lesson info for link lookup
+            source_metadata: SourceMetadata = {
                 "text": source_text,
                 "course_title": course_title,
                 "lesson_number": lesson_num
-            })
+            }
+            sources.append(source_metadata)
 
             formatted.append(f"{header}\n{doc}")
 
