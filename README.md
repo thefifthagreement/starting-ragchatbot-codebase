@@ -28,7 +28,7 @@ This application is a full-stack web application that enables users to query cou
 
 3. **Set up environment variables**
 
-   Create a `.env` file at `./api_keys/.env` (relative to the backend directory):
+   Create a `.env` file at `backend/.env`:
 
    **For direct Anthropic API:**
    ```bash

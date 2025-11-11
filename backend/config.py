@@ -3,7 +3,7 @@ from dataclasses import dataclass
 from dotenv import load_dotenv
 
 # Load environment variables from .env file
-load_dotenv("./api_keys/.env")
+load_dotenv("./backend/.env")
 
 @dataclass
 class Config:

@@ -51,7 +51,7 @@ ANTHROPIC_MODEL=anthropic/claude-sonnet-4-20250514
 ANTHROPIC_BASE_URL=https://openrouter.ai/api/v1
 ```
 
-**Note**: The `.env` file is loaded from `./api_keys/.env` relative to the backend directory (see `backend/config.py:6`).
+**Note**: The `.env` file should be located at `backend/.env` (see `backend/config.py:6`).
 
 ## Core Architecture
 
