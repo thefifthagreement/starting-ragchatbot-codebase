@@ -42,13 +42,9 @@ class TestURLValidation:
 
     def test_none_value(self):
         """Test that None value doesn't cause errors"""
-        # is_safe_url expects a string, but should handle gracefully
-        try:
-            result = is_safe_url(None)
-            assert result is False
-        except (TypeError, AttributeError):
-            # If it raises an error, that's also acceptable defensive behavior
-            pass
+        # The function catches all exceptions and returns False
+        result = is_safe_url(None)
+        assert result is False
 
     def test_url_with_query_params(self):
         """Test that valid URLs with query parameters are accepted"""
